@@ -67,8 +67,9 @@
 
         <!-- Main Content -->
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <!-- User Management -->
-          <div class="lg:col-span-2">
+          <!-- Left Section -->
+          <div class="lg:col-span-2 space-y-8">
+            <!-- User Management -->
             <div class="bg-white rounded-lg shadow-lg p-6">
               <div class="flex justify-between items-center mb-6">
                 <h2 class="text-xl font-bold">用户管理</h2>
@@ -133,13 +134,87 @@
                 />
               </div>
             </div>
+
+            <!-- Project Management -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+              <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-bold">项目管理</h2>
+                <el-button type="primary" @click="showProjectAudit = true">
+                  审核项目
+                </el-button>
+              </div>
+
+              <el-tabs>
+                <el-tab-pane label="待审核">
+                  <el-table :data="pendingProjects">
+                    <el-table-column prop="title" label="项目名称" />
+                    <el-table-column prop="creator" label="创建者" />
+                    <el-table-column prop="submitTime" label="提交时间" />
+                    <el-table-column label="操作" width="200">
+                      <template #default="{ row }">
+                        <el-button type="success" size="small" @click="approveProject(row)">
+                          通过
+                        </el-button>
+                        <el-button type="danger" size="small" @click="rejectProject(row)">
+                          拒绝
+                        </el-button>
+                      </template>
+                    </el-table-column>
+                  </el-table>
+                </el-tab-pane>
+
+                <el-tab-pane label="已审核">
+                  <el-table :data="approvedProjects">
+                    <el-table-column prop="title" label="项目名称" />
+                    <el-table-column prop="creator" label="创建者" />
+                    <el-table-column prop="status" label="状态">
+                      <template #default="{ row }">
+                        <el-tag :type="row.status === 'approved' ? 'success' : 'danger'">
+                          {{ row.status === 'approved' ? '已通过' : '已拒绝' }}
+                        </el-tag>
+                      </template>
+                    </el-table-column>
+                    <el-table-column prop="auditTime" label="审核时间" />
+                  </el-table>
+                </el-tab-pane>
+              </el-tabs>
+            </div>
           </div>
 
-          <!-- Recent Activities -->
-          <div class="lg:col-span-1">
+          <!-- Right Section -->
+          <div class="lg:col-span-1 space-y-8">
+            <!-- System Status -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+              <h2 class="text-xl font-bold mb-6">系统状态</h2>
+              <div class="space-y-4">
+                <div>
+                  <div class="flex justify-between text-sm mb-2">
+                    <span class="text-gray-600">CPU使用率</span>
+                    <span class="font-medium">45%</span>
+                  </div>
+                  <el-progress :percentage="45" />
+                </div>
+                <div>
+                  <div class="flex justify-between text-sm mb-2">
+                    <span class="text-gray-600">内存使用率</span>
+                    <span class="font-medium">62%</span>
+                  </div>
+                  <el-progress :percentage="62" type="warning" />
+                </div>
+                <div>
+                  <div class="flex justify-between text-sm mb-2">
+                    <span class="text-gray-600">存储空间</span>
+                    <span class="font-medium">28%</span>
+                  </div>
+                  <el-progress :percentage="28" type="success" />
+                </div>
+              </div>
+            </div>
+
+            <!-- Recent Activities -->
             <div class="bg-white rounded-lg shadow-lg p-6">
               <h2 class="text-xl font-bold mb-6">最近活动</h2>
-              <div class="space-y-6">
+              <div class="space-y-4">
                 <div v-for="activity in recentActivities" :key="activity.id" 
                      class="flex items-start space-x-3">
                   <div class="w-8 h-8 rounded-full flex items-center justify-center"
@@ -148,39 +223,27 @@
                       <component :is="activity.icon" />
                     </el-icon>
                   </div>
-                  <div class="flex-1">
-                    <p class="text-sm text-gray-900">{{ activity.description }}</p>
+                  <div>
+                    <p class="text-sm">{{ activity.description }}</p>
                     <p class="text-xs text-gray-500">{{ activity.time }}</p>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- Quick Stats -->
-            <div class="bg-white rounded-lg shadow-lg p-6 mt-8">
-              <h2 class="text-xl font-bold mb-6">数据统计</h2>
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+              <h2 class="text-xl font-bold mb-6">快捷操作</h2>
               <div class="space-y-4">
-                <div>
-                  <div class="flex justify-between text-sm mb-2">
-                    <span class="text-gray-600">项目审核率</span>
-                    <span class="font-medium">85%</span>
-                  </div>
-                  <el-progress :percentage="85" />
-                </div>
-                <div>
-                  <div class="flex justify-between text-sm mb-2">
-                    <span class="text-gray-600">用户活跃度</span>
-                    <span class="font-medium">92%</span>
-                  </div>
-                  <el-progress :percentage="92" type="success" />
-                </div>
-                <div>
-                  <div class="flex justify-between text-sm mb-2">
-                    <span class="text-gray-600">资源利用率</span>
-                    <span class="font-medium">78%</span>
-                  </div>
-                  <el-progress :percentage="78" type="warning" />
-                </div>
+                <el-button type="primary" class="w-full" @click="showSystemSettings = true">
+                  系统设置
+                </el-button>
+                <el-button type="warning" class="w-full" @click="showBackupDialog = true">
+                  数据备份
+                </el-button>
+                <el-button type="info" class="w-full" @click="generateReport">
+                  生成报表
+                </el-button>
               </div>
             </div>
           </div>
@@ -222,14 +285,109 @@
         </span>
       </template>
     </el-dialog>
+
+    <!-- System Settings Dialog -->
+    <el-dialog
+      v-model="showSystemSettings"
+      title="系统设置"
+      width="600px"
+    >
+      <el-tabs>
+        <el-tab-pane label="基本设置">
+          <el-form label-width="120px">
+            <el-form-item label="系统名称">
+              <el-input v-model="systemSettings.name" />
+            </el-form-item>
+            <el-form-item label="网站标题">
+              <el-input v-model="systemSettings.title" />
+            </el-form-item>
+            <el-form-item label="Logo">
+              <el-upload
+                class="avatar-uploader"
+                action="#"
+                :show-file-list="false"
+                :before-upload="beforeLogoUpload"
+              >
+                <img v-if="systemSettings.logo" :src="systemSettings.logo" class="w-20 h-20">
+                <el-icon v-else><Plus /></el-icon>
+              </el-upload>
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+        
+        <el-tab-pane label="安全设置">
+          <el-form label-width="120px">
+            <el-form-item label="密码策略">
+              <el-checkbox-group v-model="systemSettings.passwordPolicy">
+                <el-checkbox label="uppercase">必须包含大写字母</el-checkbox>
+                <el-checkbox label="numbers">必须包含数字</el-checkbox>
+                <el-checkbox label="special">必须包含特殊字符</el-checkbox>
+              </el-checkbox-group>
+            </el-form-item>
+            <el-form-item label="登录尝试次数">
+              <el-input-number v-model="systemSettings.loginAttempts" :min="3" :max="10" />
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+
+        <el-tab-pane label="邮件设置">
+          <el-form label-width="120px">
+            <el-form-item label="SMTP服务器">
+              <el-input v-model="systemSettings.smtp.host" />
+            </el-form-item>
+            <el-form-item label="端口">
+              <el-input v-model="systemSettings.smtp.port" />
+            </el-form-item>
+            <el-form-item label="发件邮箱">
+              <el-input v-model="systemSettings.smtp.email" />
+            </el-form-item>
+          </el-form>
+        </el-tab-pane>
+      </el-tabs>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="showSystemSettings = false">取消</el-button>
+          <el-button type="primary" @click="saveSystemSettings">保存</el-button>
+        </span>
+      </template>
+    </el-dialog>
+
+    <!-- Backup Dialog -->
+    <el-dialog
+      v-model="showBackupDialog"
+      title="数据备份"
+      width="400px"
+    >
+      <el-form label-width="100px">
+        <el-form-item label="备份内容">
+          <el-checkbox-group v-model="backupSettings.content">
+            <el-checkbox label="users">用户数据</el-checkbox>
+            <el-checkbox label="projects">项目数据</el-checkbox>
+            <el-checkbox label="system">系统配置</el-checkbox>
+          </el-checkbox-group>
+        </el-form-item>
+        <el-form-item label="备份方式">
+          <el-radio-group v-model="backupSettings.type">
+            <el-radio label="full">完整备份</el-radio>
+            <el-radio label="incremental">增量备份</el-radio>
+          </el-radio-group>
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="showBackupDialog = false">取消</el-button>
+          <el-button type="primary" @click="startBackup">开始备份</el-button>
+        </span>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import {
   User, Briefcase, OfficeBuilding, Money, Search,
-  CircleCheck, CircleClose, Edit, Delete
+  CircleCheck, CircleClose, Edit, Delete, Plus
 } from '@element-plus/icons-vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 
@@ -240,8 +398,13 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const total = ref(100)
 
-// Edit dialog
+// Dialogs visibility
 const showEditDialog = ref(false)
+const showSystemSettings = ref(false)
+const showBackupDialog = ref(false)
+const showProjectAudit = ref(false)
+
+// Forms
 const editForm = ref({
   id: '',
   name: '',
@@ -250,7 +413,25 @@ const editForm = ref({
   status: true
 })
 
-// Mock users data
+const systemSettings = reactive({
+  name: '大学生创业项目推广平台',
+  title: '创业梦工厂',
+  logo: '',
+  passwordPolicy: ['uppercase', 'numbers'],
+  loginAttempts: 5,
+  smtp: {
+    host: 'smtp.example.com',
+    port: '587',
+    email: 'noreply@example.com'
+  }
+})
+
+const backupSettings = reactive({
+  content: ['users', 'projects'],
+  type: 'full'
+})
+
+// Mock data
 const users = ref([
   {
     id: '001',
@@ -278,7 +459,38 @@ const users = ref([
   }
 ])
 
-// Recent activities data
+const pendingProjects = ref([
+  {
+    id: 1,
+    title: '智能校园导航系统',
+    creator: '张三',
+    submitTime: '2024-02-20 10:30'
+  },
+  {
+    id: 2,
+    title: '校园二手书交易平台',
+    creator: '李四',
+    submitTime: '2024-02-20 09:15'
+  }
+])
+
+const approvedProjects = ref([
+  {
+    id: 3,
+    title: '大学生创业咨询平台',
+    creator: '王五',
+    status: 'approved',
+    auditTime: '2024-02-19 15:30'
+  },
+  {
+    id: 4,
+    title: '校园快递代取系统',
+    creator: '赵六',
+    status: 'rejected',
+    auditTime: '2024-02-19 14:20'
+  }
+])
+
 const recentActivities = ref([
   {
     id: 1,
@@ -303,14 +515,6 @@ const recentActivities = ref([
     iconColor: 'text-red-600',
     description: '用户注销: 张三',
     time: '1小时前'
-  },
-  {
-    id: 4,
-    icon: 'CircleCheck',
-    iconBg: 'bg-green-100',
-    iconColor: 'text-green-600',
-    description: '项目审核通过: 校园二手书交易平台',
-    time: '2小时前'
   }
 ])
 
@@ -357,10 +561,69 @@ const saveUser = () => {
   showEditDialog.value = false
   ElMessage.success('用户信息更新成功')
 }
+
+const beforeLogoUpload = (file: File) => {
+  ElMessage.success('Logo上传成功')
+  return false
+}
+
+const saveSystemSettings = () => {
+  ElMessage.success('系统设置保存成功')
+  showSystemSettings.value = false
+}
+
+const startBackup = () => {
+  ElMessage.success('数据备份已开始，请稍候...')
+  showBackupDialog.value = false
+}
+
+const generateReport = () => {
+  ElMessage.success('报表生成中，稍后将发送到您的邮箱')
+}
+
+const approveProject = (project: any) => {
+  ElMessage.success(`项目 "${project.title}" 已审核通过`)
+  moveProjectToApproved(project, 'approved')
+}
+
+const rejectProject = async (project: any) => {
+  try {
+    await ElMessageBox.prompt('请输入拒绝原因', '提示', {
+      confirmButtonText: '确定',
+      cancelButtonText: '取消',
+      inputType: 'textarea'
+    })
+    
+    ElMessage.success(`项目 "${project.title}" 已被拒绝`)
+    moveProjectToApproved(project, 'rejected')
+  } catch {
+    // User canceled
+  }
+}
+
+const moveProjectToApproved = (project: any, status: 'approved' | 'rejected') => {
+  const index = pendingProjects.value.findIndex(p => p.id === project.id)
+  if (index > -1) {
+    pendingProjects.value.splice(index, 1)
+    approvedProjects.value.unshift({
+      ...project,
+      status,
+      auditTime: new Date().toLocaleString()
+    })
+  }
+}
 </script>
 
 <style scoped>
 .admin-dashboard {
   background-color: #f9fafb;
+}
+
+.avatar-uploader {
+  display: inline-block;
+}
+
+.avatar-uploader:hover {
+  cursor: pointer;
 }
 </style>

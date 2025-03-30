@@ -48,6 +48,13 @@
         >
           登录
         </el-button>
+
+        <!-- Admin Login Shortcut -->
+        <div class="text-center mt-4">
+          <el-button type="text" @click="loginAsAdmin">
+            管理员登录
+          </el-button>
+        </div>
       </el-form>
     </div>
   </div>
@@ -55,12 +62,14 @@
 
 <script setup lang="ts">
 import { ref, reactive } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { Message, Lock } from '@element-plus/icons-vue'
 import { useUserStore } from '../../stores/user'
 import type { FormInstance, FormRules } from 'element-plus'
+import { ElMessage } from 'element-plus'
 
 const router = useRouter()
+const route = useRoute()
 const userStore = useUserStore()
 const formRef = ref<FormInstance>()
 const loading = ref(false)
@@ -99,13 +108,38 @@ const handleLogin = async () => {
           email: form.email
         })
         
-        router.push('/')
+        const redirectPath = route.query.redirect as string || '/'
+        router.push(redirectPath)
       } catch (error) {
         console.error('Login failed:', error)
+        ElMessage.error('登录失败，请检查邮箱和密码')
       } finally {
         loading.value = false
       }
     }
   })
+}
+
+const loginAsAdmin = async () => {
+  loading.value = true
+  try {
+    // 模拟管理员登录
+    await new Promise(resolve => setTimeout(resolve, 1000))
+    
+    userStore.login({
+      id: 999,
+      username: 'admin',
+      role: 'admin',
+      email: 'admin@example.com'
+    })
+    
+    ElMessage.success('管理员登录成功')
+    router.push('/admin')
+  } catch (error) {
+    console.error('Admin login failed:', error)
+    ElMessage.error('管理员登录失败')
+  } finally {
+    loading.value = false
+  }
 }
 </script>
