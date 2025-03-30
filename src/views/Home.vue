@@ -59,7 +59,7 @@
             <p class="text-gray-600">创业项目</p>
           </div>
           <div class="stat-card bg-white p-8 rounded-lg shadow">
-            <el-icon class="text-4xl text-purple-600 mb-4"><Office /></el-icon>
+            <el-icon class="text-4xl text-purple-600 mb-4"><OfficeBuilding /></el-icon>
             <h3 class="text-2xl font-bold mb-2">100+</h3>
             <p class="text-gray-600">合作企业</p>
           </div>
@@ -71,7 +71,7 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { User, Briefcase, Office } from '@element-plus/icons-vue'
+import { User, Briefcase,OfficeBuilding } from '@element-plus/icons-vue'
 
 const featuredProjects = ref([
   {

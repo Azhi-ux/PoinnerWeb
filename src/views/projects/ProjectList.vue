@@ -60,7 +60,7 @@
                 {{ project.favorites }}
               </span>
               <span class="flex items-center text-sm text-gray-500">
-                <el-icon class="mr-1"><ThumbsUp /></el-icon>
+                <el-icon class="mr-1"><ArrowUp /></el-icon>
                 {{ project.likes }}
               </span>
             </div>
@@ -86,7 +86,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { Search, Star, StarFilled, View, ThumbsUp } from '@element-plus/icons-vue'
+import { Search, Star, StarFilled, View, ArrowUp } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const searchQuery = ref('')
